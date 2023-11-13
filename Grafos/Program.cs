@@ -18,6 +18,8 @@ grafo.addEdge(1, 3, 4);
 grafo.addEdge(2, 3, 5);
 grafo.addEdge(2, 5, 6);
 grafo.addEdge(5, 4, 2);
+grafo.addEdge(3, 4, 3);
+grafo.addEdge(0,4,0.5f);
 
 Console.WriteLine("Grafo: ");
 
@@ -29,6 +31,10 @@ grafo.toAjacentMatrix();
 Console.WriteLine("------------");
 
 grafo.toIncidenceMatrix();
+
+Console.WriteLine("-------------");
+
+grafo.minimumSpanningTree();
 
 
 

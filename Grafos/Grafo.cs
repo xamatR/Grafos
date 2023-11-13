@@ -207,11 +207,12 @@ namespace Grafos {
             }
             return false;
         }
-
+        //Prim's algorithm
         public void minimumSpanningTree() {
+            Console.WriteLine("Minimun Spanning Tree(Prim)");
             List<int> tree = new List<int>();
             List<Edge> frontierEdges = new List<Edge>();
-
+            List<string> edges = new List<string>();
             tree.Add(this.nodes.First().id);
             foreach (var edge in this.nodes.First().edges) {
                 frontierEdges.Add(edge);
@@ -224,27 +225,58 @@ namespace Grafos {
                 auxEdge = frontierEdges.Find(x => x.weight == frontierEdges.Min(y => y.weight));
                 //add the target node to the tree
                 tree.Add(auxEdge.idTarget);
+                edges.Add(auxEdge.idOrigin + " -> " + auxEdge.idTarget);
 
                 //update the frontier
                 foreach (var edge2 in this.nodes[auxEdge.idTarget].edges) {
                     frontierEdges.Add(edge2);
                 }
-                foreach (var edge2 in frontierEdges) {
+                foreach (var edge2 in frontierEdges.ToList()) {
                     if (tree.Contains(edge2.idTarget)) {
                         frontierEdges.Remove(edge2);
                     }
                 }
             }
+            
+            //print the list like a tree
 
-            Console.Write(tree[0]);
-            tree.RemoveAt(0);
-            foreach (var item in tree) {
-                Console.Write(" -> " + item);
+            foreach (var item in edges) {
+                Console.Write("{" + item +"}");
             }
 
-            Console.Write(".");
+            float weight = totalWeightListOfNodes(tree);
+
+            Console.WriteLine("\nTotal weight of minimun spannig tree: " + weight);
         }
 
+        //Kruskal's algorithm
+        public void MSTKruskal() {
+            Console.WriteLine("Minimun Spaning Tree (Kruskal)");
 
+            //TODO: implement Kruskal's algorithm
+
+        }
+
+        private float totalWeightListOfNodes(List<int> nodes) {
+            float total = 0;
+            for(int i =0; i < nodes.Count - 1; i++) {
+                total += this.findMinimunEdgeWeightTwoNodes(nodes[i], nodes[i + 1]);
+            }
+            
+            return total;
+        }
+
+        private float findMinimunEdgeWeightTwoNodes(int idOrigin, int idTarget) {
+            foreach (var node in nodes) {
+                if (node.id == idOrigin) {
+                    foreach (var edge in node.edges) {
+                        if (edge.idTarget == idTarget) {
+                            return edge.weight;
+                        }
+                    }
+                }
+            }
+            return 0;
+        }
     }
 }

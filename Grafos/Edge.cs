@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Grafos {
-    internal class Edge {
+    internal class Edge :IComparable<Edge> {
 
         public int idTarget { get; private set; }
         public int idOrigin { get; private set; }
@@ -15,7 +15,10 @@ namespace Grafos {
             this.idTarget = idTarget;
             this.idOrigin = idOrigin;
             this.weight = weight;
-        }   
+        }
 
+        public int CompareTo(Edge other) {
+            return this.weight.CompareTo(other.weight);
+        }
     }
 }
