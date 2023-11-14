@@ -20,5 +20,9 @@ namespace Grafos {
         public int CompareTo(Edge other) {
             return this.weight.CompareTo(other.weight);
         }
+
+        public override string ToString() {
+            return "Origin: "  + this.idOrigin + " Target: " + this.idTarget + " Weight: " + this.weight;
+        }
     }
 }

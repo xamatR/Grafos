@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -210,10 +211,10 @@ namespace Grafos {
         //Prim's algorithm
         public void minimumSpanningTree() {
             Console.WriteLine("Minimun Spanning Tree(Prim)");
-            List<int> tree = new List<int>();
+            List<int> nodesInSolution = new List<int>();
             List<Edge> frontierEdges = new List<Edge>();
-            List<string> edges = new List<string>();
-            tree.Add(this.nodes.First().id);
+            List<Edge> tree = new List<Edge>();
+            nodesInSolution.Add(this.nodes.First().id);
             foreach (var edge in this.nodes.First().edges) {
                 frontierEdges.Add(edge);
             }
@@ -223,28 +224,39 @@ namespace Grafos {
             while (frontierEdges.Count != 0) {
                 //find the edge with the minimum weight
                 auxEdge = frontierEdges.Find(x => x.weight == frontierEdges.Min(y => y.weight));
-                //add the target node to the tree
-                tree.Add(auxEdge.idTarget);
-                edges.Add(auxEdge.idOrigin + " -> " + auxEdge.idTarget);
-
+                //add the target node to the nodesInSolution
+                nodesInSolution.Add(auxEdge.idTarget);
+                tree.Add(auxEdge);
                 //update the frontier
-                foreach (var edge2 in this.nodes[auxEdge.idTarget].edges) {
-                    frontierEdges.Add(edge2);
+                foreach (var edge in findNode(auxEdge.idTarget).edges.ToList()) {
+                    if(!nodesInSolution.Contains(edge.idTarget))
+                        frontierEdges.Add(edge);                 
                 }
-                foreach (var edge2 in frontierEdges.ToList()) {
-                    if (tree.Contains(edge2.idTarget)) {
-                        frontierEdges.Remove(edge2);
+                //remove the edge from the frontier
+                foreach(var edge in frontierEdges.ToList()) {
+                    if (edge.idTarget == auxEdge.idTarget) {
+                        frontierEdges.Remove(edge);
                     }
                 }
-            }
-            
-            //print the list like a tree
 
-            foreach (var item in edges) {
-                Console.Write("{" + item +"}");
+                //foreach (var edge in frontierEdges.ToList()) {
+                //    if (nodesInSolution.Contains(edge.idTarget)) {
+                //        frontierEdges.Remove(edge);
+                //    }
+                //}
             }
 
-            float weight = totalWeightListOfNodes(tree);
+            //print the list like a nodesInSolution
+
+            foreach (var item in tree) {
+                Console.WriteLine("{" + item.ToString() + "}");
+            }
+
+            foreach (var item in nodesInSolution) {
+                Console.Write(item + " ");
+            }
+
+            float weight = totalWheightOfEdges(tree);
 
             Console.WriteLine("\nTotal weight of minimun spannig tree: " + weight);
         }
@@ -259,10 +271,18 @@ namespace Grafos {
 
         private float totalWeightListOfNodes(List<int> nodes) {
             float total = 0;
-            for(int i =0; i < nodes.Count - 1; i++) {
+            for (int i = 0; i < nodes.Count - 1; i++) {
                 total += this.findMinimunEdgeWeightTwoNodes(nodes[i], nodes[i + 1]);
             }
-            
+
+            return total;
+        }
+
+        private float totalWheightOfEdges(List<Edge> edges) {
+            float total = 0;
+            foreach (var edge in edges) {
+                total += edge.weight;
+            }
             return total;
         }
 
