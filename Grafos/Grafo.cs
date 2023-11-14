@@ -52,7 +52,7 @@ namespace Grafos {
         public void removeNode(int id) {
             if (this.hasNode(id)) {
                 Node node = findNode(id);
-                foreach (var edge in node.edges) {
+                foreach (var edge in node.edges.ToList()) {
                     this.removeEdge(edge.idOrigin, edge.idTarget);
                 }
                 this.nodes.Remove(node);
@@ -186,7 +186,6 @@ namespace Grafos {
                 }
             }
 
-
             for (int i = 0; i < this.order; i++) {
                 for (int j = 0; j < edgesSum; j++) {
                     Console.Write(matrix[i, j] + " ");
@@ -197,16 +196,7 @@ namespace Grafos {
         }
 
         private bool hasEdge(int idOrigin, int idTarget) {
-            foreach (var node in nodes) {
-                if (node.id == idOrigin) {
-                    foreach (var edge in node.edges) {
-                        if (edge.idTarget == idTarget) {
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
+            return (findNode(idOrigin).edges.Find(x => x.idTarget == idTarget) != null) ? true: false;
         }
         //Prim's algorithm
         public void minimumSpanningTree() {
@@ -269,14 +259,6 @@ namespace Grafos {
 
         }
 
-        private float totalWeightListOfNodes(List<int> nodes) {
-            float total = 0;
-            for (int i = 0; i < nodes.Count - 1; i++) {
-                total += this.findMinimunEdgeWeightTwoNodes(nodes[i], nodes[i + 1]);
-            }
-
-            return total;
-        }
 
         private float totalWheightOfEdges(List<Edge> edges) {
             float total = 0;
@@ -286,17 +268,6 @@ namespace Grafos {
             return total;
         }
 
-        private float findMinimunEdgeWeightTwoNodes(int idOrigin, int idTarget) {
-            foreach (var node in nodes) {
-                if (node.id == idOrigin) {
-                    foreach (var edge in node.edges) {
-                        if (edge.idTarget == idTarget) {
-                            return edge.weight;
-                        }
-                    }
-                }
-            }
-            return 0;
-        }
+        
     }
 }
