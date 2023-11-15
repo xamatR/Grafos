@@ -36,6 +36,14 @@ Console.WriteLine("-------------");
 
 grafo.minimumSpanningTree();
 
+Console.WriteLine("-------------");
+
+grafo.breadthSearch();
+
+Console.WriteLine("\n-------------");
+
+grafo.depthSearch();
+
 
 
 

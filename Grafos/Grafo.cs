@@ -223,7 +223,7 @@ namespace Grafos {
                         frontierEdges.Add(edge);                 
                 }
                 //remove the edge from the frontier
-                foreach(var edge in frontierEdges.ToList()) {
+                foreach (var edge in frontierEdges.ToList()) {
                     if (edge.idTarget == auxEdge.idTarget) {
                         frontierEdges.Remove(edge);
                     }
@@ -257,6 +257,51 @@ namespace Grafos {
 
             //TODO: implement Kruskal's algorithm
 
+        }
+
+        public void depthSearch() {
+            Console.WriteLine("Depth Search");
+            List<int> visitedNodes = new List<int>();
+            Stack<int> stack = new Stack<int>();
+
+            stack.Push(this.nodes.First().id);
+            visitedNodes.Add(this.nodes.First().id);
+            int aux;
+            while (stack.Count != 0) {
+                aux = stack.Pop();
+                foreach (var edge in findNode(aux).edges) {
+                    if (!visitedNodes.Contains(edge.idTarget)) {
+                        stack.Push(edge.idTarget);
+                        visitedNodes.Add(edge.idTarget);
+                    }
+                }
+            }
+
+            foreach (var item in visitedNodes) {
+                Console.Write(item + " ");
+            }
+        }
+
+        public void breadthSearch() {
+            Console.WriteLine("Breadth Search");
+            List<int> visitedNodes = new List<int>();
+            Queue<int> queue = new Queue<int>();
+            queue.Enqueue(this.nodes.First().id);
+            visitedNodes.Add(this.nodes.First().id);
+            int aux;
+            while (queue.Count != 0) {
+                aux = queue.Dequeue();
+                foreach (var edge in findNode(aux).edges) {
+                    if (!visitedNodes.Contains(edge.idTarget)) {
+                        queue.Enqueue(edge.idTarget);
+                        visitedNodes.Add(edge.idTarget);
+                    }
+                }
+            }
+
+            foreach (var item in visitedNodes) {
+                Console.Write(item + " ");
+            }
         }
 
 
