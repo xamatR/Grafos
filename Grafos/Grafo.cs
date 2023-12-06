@@ -155,12 +155,46 @@ namespace Grafos {
                 }
             }
 
+            if (!this.directed) {
+                for (int i = 0; i < this.order; i++) {
+                    for (int j = 0; j < this.order; j++) {
+                        if (j <= i) {
+                            matrix[i, j] = 0;
+                        }
+                    }
+                }
+            }
+
+
+
             for (int i = 0; i < this.order; i++) {
                 for (int j = 0; j < this.order; j++) {
                     Console.Write(matrix[i, j] + " ");
                 }
                 Console.WriteLine();
             }
+
+        }
+
+        public int[,] toAdjacencyMatrixWithReturn() {
+            int[,] matrix = new int[this.order, this.order];
+            foreach (var node in nodes) {
+                foreach (var edge in node.edges) {
+                    matrix[node.id, edge.idTarget] = 1;
+                }
+            }
+
+            if (!this.directed) {
+                for (int i = 0; i < this.order; i++) {
+                    for (int j = 0; j < this.order; j++) {
+                        if (j <= i) {
+                            matrix[i, j] = 0;
+                        }
+                    }
+                }
+            }
+
+            return matrix;
         }
 
 
@@ -196,7 +230,7 @@ namespace Grafos {
         }
 
         private bool hasEdge(int idOrigin, int idTarget) {
-            return (findNode(idOrigin).edges.Find(x => x.idTarget == idTarget) != null) ? true: false;
+            return (findNode(idOrigin).edges.Find(x => x.idTarget == idTarget) != null) ? true : false;
         }
         //Prim's algorithm
         public void minimumSpanningTree() {
@@ -219,8 +253,8 @@ namespace Grafos {
                 tree.Add(auxEdge);
                 //update the frontier
                 foreach (var edge in findNode(auxEdge.idTarget).edges.ToList()) {
-                    if(!nodesInSolution.Contains(edge.idTarget))
-                        frontierEdges.Add(edge);                 
+                    if (!nodesInSolution.Contains(edge.idTarget))
+                        frontierEdges.Add(edge);
                 }
                 //remove the edge from the frontier
                 foreach (var edge in frontierEdges.ToList()) {
@@ -304,6 +338,103 @@ namespace Grafos {
             }
         }
 
+        //Dijkstra's algorithm
+        public void Dijkstra(int idOrigin) {
+            Console.WriteLine("Dijkstra");
+
+            bool[] visitedNodes = new bool[this.order];
+            float[] distance = new float[this.order];
+
+
+            for (int i = 0; i < this.order; i++) {
+                distance[i] = float.MaxValue;
+                visitedNodes[i] = false;
+            }
+            //distance of the origin node to itself is 0
+            distance[idOrigin] = 0;
+
+            for(int i= 0; i < this.order; i++) {
+                //find the node with the minimum distance
+                int aux = minDistance(distance, visitedNodes);
+                visitedNodes[aux] = true;
+
+                //update the distance of the adjacent nodes
+                foreach (var edge in findNode(aux).edges) {
+                    if (!visitedNodes[edge.idTarget] //if the node is not visited
+                        && distance[aux] != float.MaxValue //and the distance of the node is not infinity
+                        && findNode(edge.idTarget).weight + distance[aux] < distance[edge.idTarget]){
+
+                        distance[edge.idTarget] = findNode(edge.idTarget).weight + distance[aux];
+                    }
+                }
+
+            }
+            for(int i = 0; i < distance.Length; i++) {
+                Console.WriteLine("Distance from " + idOrigin + " to " + i + ": " + distance[i]);
+            }
+            //this.nodes.Reverse();
+        }
+
+        public void orderTopological() {
+            Console.WriteLine("Order Topological");
+            List<int> visitedNodes = new List<int>();
+            Stack<int> stack = new Stack<int>();
+
+            stack.Push(this.nodes.First().id);
+            visitedNodes.Add(this.nodes.First().id);
+            int aux;
+            while (stack.Count != 0) {
+                aux = stack.Pop();
+                foreach (var edge in findNode(aux).edges) {
+                    if (!visitedNodes.Contains(edge.idTarget)) {
+                        stack.Push(edge.idTarget);
+                        visitedNodes.Add(edge.idTarget);
+                    }
+                }
+            }
+
+            foreach (var item in visitedNodes) {
+                Console.Write(item + " ");
+            }
+        }
+
+        public void eulerianCycle() {
+            Console.WriteLine("Eulerian Cycle");
+            List<int> visitedNodes = new List<int>();
+            Stack<int> stack = new Stack<int>();
+
+            stack.Push(this.nodes.First().id);
+            visitedNodes.Add(this.nodes.First().id);
+            int aux;
+            while (stack.Count != 0) {
+                aux = stack.Pop();
+                foreach (var edge in findNode(aux).edges) {
+                    if (!visitedNodes.Contains(edge.idTarget)) {
+                        stack.Push(edge.idTarget);
+                        visitedNodes.Add(edge.idTarget);
+                    }
+                }
+            }
+
+            foreach (var item in visitedNodes) {
+                Console.Write(item + " ");
+            }
+        }
+
+        
+        private int minDistance(float[] distance, bool[] visitedNodes) {
+            float min = float.MaxValue;
+            int minIndex = 0;
+
+            for (int i = 0; i < this.order; i++) {
+                if (!visitedNodes[i] && distance[i] <= min) {
+                    min = distance[i];
+                    minIndex = i;
+                }
+            }
+
+            return minIndex;
+        }
 
         private float totalWheightOfEdges(List<Edge> edges) {
             float total = 0;
@@ -313,6 +444,6 @@ namespace Grafos {
             return total;
         }
 
-        
+
     }
 }
