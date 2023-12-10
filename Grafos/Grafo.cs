@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -342,6 +343,11 @@ namespace Grafos {
         public void Dijkstra(int idOrigin) {
             Console.WriteLine("Dijkstra");
 
+            if(!hasNode(idOrigin)) {
+                Console.WriteLine("Not founded node.");
+                return;
+            }
+
             bool[] visitedNodes = new bool[this.order];
             float[] distance = new float[this.order];
 
@@ -442,6 +448,34 @@ namespace Grafos {
                 total += edge.weight;
             }
             return total;
+        }
+
+        public void toMatrixWithWeight() {
+            int[,] matrix = new int[this.order, this.order];
+            foreach (var node in nodes) {
+                foreach (var edge in node.edges) {
+                    matrix[node.id, edge.idTarget] = (int)edge.weight;
+                }
+            }
+
+            if (!this.directed) {
+                for (int i = 0; i < this.order; i++) {
+                    for (int j = 0; j < this.order; j++) {
+                        if (j <= i) {
+                            matrix[i, j] = 0;
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < this.order; i++) {
+                for (int j = 0; j < this.order; j++) {
+                    Console.Write(matrix[i, j] + " ");
+                }
+                Console.WriteLine();
+            }
+
+
         }
 
 
