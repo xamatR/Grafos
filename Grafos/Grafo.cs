@@ -254,6 +254,7 @@ namespace Grafos {
                 tree.Add(auxEdge);
                 //update the frontier
                 foreach (var edge in findNode(auxEdge.idTarget).edges.ToList()) {
+                    //if the node is already in the solution then dont add the edge
                     if (!nodesInSolution.Contains(edge.idTarget))
                         frontierEdges.Add(edge);
                 }
@@ -343,7 +344,7 @@ namespace Grafos {
         public void Dijkstra(int idOrigin) {
             Console.WriteLine("Dijkstra");
 
-            if(!hasNode(idOrigin)) {
+            if (!hasNode(idOrigin)) {
                 Console.WriteLine("Not founded node.");
                 return;
             }
@@ -359,7 +360,7 @@ namespace Grafos {
             //distance of the origin node to itself is 0
             distance[idOrigin] = 0;
 
-            for(int i= 0; i < this.order; i++) {
+            for (int i = 0; i < this.order; i++) {
                 //find the node with the minimum distance
                 int aux = minDistance(distance, visitedNodes);
                 visitedNodes[aux] = true;
@@ -368,14 +369,14 @@ namespace Grafos {
                 foreach (var edge in findNode(aux).edges) {
                     if (!visitedNodes[edge.idTarget] //if the node is not visited
                         && distance[aux] != float.MaxValue //and the distance of the node is not infinity
-                        && findNode(edge.idTarget).weight + distance[aux] < distance[edge.idTarget]){
+                        && findNode(edge.idTarget).weight + distance[aux] < distance[edge.idTarget]) {
 
                         distance[edge.idTarget] = findNode(edge.idTarget).weight + distance[aux];
                     }
                 }
 
             }
-            for(int i = 0; i < distance.Length; i++) {
+            for (int i = 0; i < distance.Length; i++) {
                 Console.WriteLine("Distance from " + idOrigin + " to " + i + ": " + distance[i]);
             }
             //this.nodes.Reverse();
@@ -406,6 +407,11 @@ namespace Grafos {
 
         public void eulerianCycle() {
             Console.WriteLine("Eulerian Cycle");
+
+            if (!eulerianGraph()) {
+                Console.WriteLine("Not eulerian graph.");
+                return;
+            }
             List<int> visitedNodes = new List<int>();
             Stack<int> stack = new Stack<int>();
 
@@ -427,7 +433,16 @@ namespace Grafos {
             }
         }
 
-        
+        public bool eulerianGraph() {
+            foreach (var node in nodes) {
+                if (node.edges.Count % 2 != 0) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+
         private int minDistance(float[] distance, bool[] visitedNodes) {
             float min = float.MaxValue;
             int minIndex = 0;
@@ -474,6 +489,48 @@ namespace Grafos {
                 }
                 Console.WriteLine();
             }
+
+
+        }
+
+        public int[,] toMatrixWithWeightAndInfinity() {
+            int[,] matrix = new int[this.order, this.order];
+
+            for (int i = 0; i < this.order; i++) {
+                for (int j = 0; j < this.order; j++) {
+                    matrix[i, j] = 0;
+                }
+            }
+
+            foreach (var node in nodes) {
+                foreach (var edge in node.edges) {
+                    matrix[node.id, edge.idTarget] = (int)edge.weight;
+                }
+            }
+
+            if (this.directed) {
+                for (int i = 0; i < this.order; i++) {
+                    for (int j = 0; j < this.order; j++) {
+                        //if the node is in superior triangular and the value is 0 then change to infinity
+                        if (i != j && matrix[i, j] == 0) {
+                            matrix[i, j] = 999;
+                        }
+                    }
+                }
+            } else {
+                for (int i = 0; i < this.order; i++) {
+                    for (int j = 0; j < this.order; j++) {
+                        if (j <= i) {
+                            matrix[i, j] = 0;
+                        }else if (matrix[i, j] == 0) {
+                            matrix[i, j] = 999;
+                        }
+                    }
+                }
+
+            }
+
+            return matrix;
 
 
         }

@@ -57,7 +57,7 @@ int subMenu() {
 void writeGraphFile(string path, Grafo grafo) {
     string[] lines = new string[grafo.nodes.Count + 1];
     lines[0] = grafo.nodes.Count.ToString();
-    int[,] matrix = grafo.toAdjacencyMatrixWithReturn();
+    int[,] matrix = grafo.toMatrixWithWeightAndInfinity();
     for (int i = 0; i < grafo.nodes.Count; i++) {
         string line = "";
         for (int j = 0; j < grafo.nodes.Count; j++) {
@@ -66,7 +66,7 @@ void writeGraphFile(string path, Grafo grafo) {
         lines[i + 1] = line;
     }
     System.IO.File.WriteAllLines(path, lines);
-    Console.WriteLine("Printed");
+    Console.WriteLine("Arquivo salvo na pasta" + System.IO.Directory.GetCurrentDirectory() + " com o nome de " + path + ".");
 }
 
 bool menuGraphType() {
@@ -145,14 +145,16 @@ if (option1 == 1) {
         }
     }
     Console.WriteLine("Deseja salvar o grafo? (s/n)");
+    
     char save = Console.ReadKey().KeyChar;
+    Console.WriteLine("");
     if (save == 's') {
-        Console.WriteLine("Digite o nome do arquivo: ");
-        string path = Console.ReadLine();
+        Console.WriteLine("Digite o nome do arquivo:");
+        string path = Console.ReadLine() + ".txt";
+        if(path == ".txt") path = "output.txt";
+        Console.WriteLine("");
         writeGraphFile(path, grafo);
     }
-} else {
-    Console.WriteLine("Saindo...");
 }
 
 
