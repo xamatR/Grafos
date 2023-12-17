@@ -61,7 +61,7 @@ void writeGraphFile(string path, Grafo grafo) {
     for (int i = 0; i < grafo.nodes.Count; i++) {
         string line = "";
         for (int j = 0; j < grafo.nodes.Count; j++) {
-            line += matrix[i, j].ToString() + " ";
+            line += matrix[i, j].ToString() + ",";
         }
         lines[i + 1] = line;
     }

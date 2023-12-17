@@ -32,10 +32,8 @@ namespace Grafos {
         }
 
         private Node findNode(int id) {
-            foreach (var node in nodes) {
-                if (node.id == id) {
-                    return node;
-                }
+            foreach (Node node in nodes) {
+                if (node.id == id) return node;
             }
             return null;
         }
@@ -351,11 +349,12 @@ namespace Grafos {
 
             bool[] visitedNodes = new bool[this.order];
             float[] distance = new float[this.order];
-
+            Stack<int>[] pathStack = new Stack<int>[this.order];
 
             for (int i = 0; i < this.order; i++) {
                 distance[i] = float.MaxValue;
                 visitedNodes[i] = false;
+                pathStack[i] = new Stack<int>();
             }
             //distance of the origin node to itself is 0
             distance[idOrigin] = 0;
@@ -367,19 +366,49 @@ namespace Grafos {
 
                 //update the distance of the adjacent nodes
                 foreach (var edge in findNode(aux).edges) {
-                    if (!visitedNodes[edge.idTarget] //if the node is not visited
-                        && distance[aux] != float.MaxValue //and the distance of the node is not infinity
-                        && findNode(edge.idTarget).weight + distance[aux] < distance[edge.idTarget]) {
+                    if (edge == null) continue;
 
-                        distance[edge.idTarget] = findNode(edge.idTarget).weight + distance[aux];
+                    if (!visitedNodes[edge.idTarget]
+                        && edge.weight != 0
+                        && (distance[aux] + edge.weight < distance[edge.idTarget])) {
+                        distance[edge.idTarget] = distance[aux] + edge.weight;
+                        pathStack[edge.idTarget].Clear();
+                        pathStack[edge.idTarget].Push(aux);
+
+                        foreach(var node in pathStack[aux]) {
+                            pathStack[edge.idTarget].Push((int)node);
+                        }
                     }
                 }
+            }
+            for (int i = 0; i < this.order; i++) {
+                Console.Write($"Distance from {idOrigin} to {i}: {distance[i]}, Path: ");
+                PrintPath(pathStack[i]);
+                Console.WriteLine();
+            }
+        }
 
+        private void PrintPath(Stack<int> pathStack) {
+            while (pathStack.Count > 0) {
+                Console.Write(pathStack.Pop() + " ");
             }
+        }
+
+        private int minDistance(float[] distance, bool[] visitedNodes) {
+            float min = float.MaxValue;
+            int minIndex = -1;
+
             for (int i = 0; i < distance.Length; i++) {
-                Console.WriteLine("Distance from " + idOrigin + " to " + i + ": " + distance[i]);
+                if (!visitedNodes[i] && distance[i] <= min) {
+                    min = distance[i];
+                    minIndex = i;
+                }
             }
-            //this.nodes.Reverse();
+            if(minIndex == -1) {
+                Console.WriteLine("No valid minIndex found. All remaining nodes are unreachable.");
+            }
+
+            return minIndex;
         }
 
         public void orderTopological() {
@@ -412,21 +441,31 @@ namespace Grafos {
                 Console.WriteLine("Not eulerian graph.");
                 return;
             }
+
             List<int> visitedNodes = new List<int>();
             Stack<int> stack = new Stack<int>();
 
             stack.Push(this.nodes.First().id);
+
             visitedNodes.Add(this.nodes.First().id);
             int aux;
             while (stack.Count != 0) {
-                aux = stack.Pop();
-                foreach (var edge in findNode(aux).edges) {
+                int current = stack.Peek();
+                bool found = false;
+
+                foreach (var edge in findNode(current).edges) {
                     if (!visitedNodes.Contains(edge.idTarget)) {
                         stack.Push(edge.idTarget);
                         visitedNodes.Add(edge.idTarget);
+                        found = true;
+                        break;
                     }
                 }
+                if (!found) {
+                    stack.Pop();
+                }
             }
+
 
             foreach (var item in visitedNodes) {
                 Console.Write(item + " ");
@@ -443,19 +482,7 @@ namespace Grafos {
         }
 
 
-        private int minDistance(float[] distance, bool[] visitedNodes) {
-            float min = float.MaxValue;
-            int minIndex = 0;
-
-            for (int i = 0; i < this.order; i++) {
-                if (!visitedNodes[i] && distance[i] <= min) {
-                    min = distance[i];
-                    minIndex = i;
-                }
-            }
-
-            return minIndex;
-        }
+        
 
         private float totalWheightOfEdges(List<Edge> edges) {
             float total = 0;
@@ -522,7 +549,7 @@ namespace Grafos {
                     for (int j = 0; j < this.order; j++) {
                         if (j <= i) {
                             matrix[i, j] = 0;
-                        }else if (matrix[i, j] == 0) {
+                        } else if (matrix[i, j] == 0) {
                             matrix[i, j] = 999;
                         }
                     }
