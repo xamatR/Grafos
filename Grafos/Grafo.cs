@@ -375,7 +375,7 @@ namespace Grafos {
                         pathStack[edge.idTarget].Clear();
                         pathStack[edge.idTarget].Push(aux);
 
-                        foreach(var node in pathStack[aux]) {
+                        foreach (var node in pathStack[aux]) {
                             pathStack[edge.idTarget].Push((int)node);
                         }
                     }
@@ -404,7 +404,7 @@ namespace Grafos {
                     minIndex = i;
                 }
             }
-            if(minIndex == -1) {
+            if (minIndex == -1) {
                 Console.WriteLine("No valid minIndex found. All remaining nodes are unreachable.");
             }
 
@@ -442,35 +442,31 @@ namespace Grafos {
                 return;
             }
 
-            List<int> visitedNodes = new List<int>();
+            // Create a copy of the graph
+            Grafo auxGraph = this;
+
             Stack<int> stack = new Stack<int>();
+            List<int> cycle = new List<int>();
 
-            stack.Push(this.nodes.First().id);
+            int current = auxGraph.nodes.First().id;
+            eulerianCycleUtil(current, stack, cycle, auxGraph);
 
-            visitedNodes.Add(this.nodes.First().id);
-            int aux;
-            while (stack.Count != 0) {
-                int current = stack.Peek();
-                bool found = false;
-
-                foreach (var edge in findNode(current).edges) {
-                    if (!visitedNodes.Contains(edge.idTarget)) {
-                        stack.Push(edge.idTarget);
-                        visitedNodes.Add(edge.idTarget);
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    stack.Pop();
-                }
-            }
-
-
-            foreach (var item in visitedNodes) {
+            foreach (var item in cycle) {
                 Console.Write(item + " ");
             }
         }
+
+        private void eulerianCycleUtil(int current, Stack<int> stack, List<int> cycle, Grafo auxGraph) {
+            while (auxGraph.findNode(current).edges.Count > 0) {
+                int next_node = auxGraph.findNode(current).edges.First().idTarget;
+                // Remove edge from the auxiliary graph
+                auxGraph.findNode(current).edges.Remove(auxGraph.findNode(current).edges.First());
+                eulerianCycleUtil(next_node, stack, cycle, auxGraph);
+            }
+            cycle.Insert(0, current);
+        }
+
+
 
         public bool eulerianGraph() {
             foreach (var node in nodes) {
@@ -479,6 +475,10 @@ namespace Grafos {
                 }
             }
             return true;
+        }
+
+        public void eulerianTour() {
+
         }
 
 
